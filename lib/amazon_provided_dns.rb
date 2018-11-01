@@ -1,8 +1,6 @@
 require 'net/http'
 
-def get_amazon_provided_dns_ip
-  dns = {}
-
+def get_amazon_provided_dns_ips
   metadata_base_ip = "169.254.169.254"
 
   mac_addr = Net::HTTP.get(metadata_base_ip, "/latest/meta-data/mac")
@@ -11,13 +9,16 @@ def get_amazon_provided_dns_ip
   splited_ip = ip.split(".")
   splited_ip[3] = splited_ip[3].to_i + 2
 
-  dns[:ip] = splited_ip.join(".")
+  dns = {
+    :ip     => "169.254.169.253",
+    :vpc_ip => splited_ip.join("."),
+  }
 
   dns
 end
 
 def create_objects
-  amazon_provided_dns Mash.new(get_amazon_provided_dns_ip)
+  amazon_provided_dns Mash.new(get_amazon_provided_dns_ips)
 end
 
 Ohai.plugin(:AmazonProvidedDNS) do
